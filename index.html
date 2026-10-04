@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f7f2">
+  <meta name="description" content="小满宝宝的百日宴 · 小小的你，大大的欢喜。邀你一起见证一百天的可爱与成长。">
+  <meta property="og:title" content="小满宝宝的百日宴邀请函">
+  <meta property="og:description" content="小小的你，大大的欢喜。诚邀你一起分享我们的百日之喜。">
+  <title>小满的百日宴 · 小日子</title>
+  <link rel="icon" href="./assets/bear.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.7 6.3.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.3-.9z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m14 5 5 5M4 20l5-1L20 8a2 2 0 0 0-5-5L4 14z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 11h16m-11 5h1m4 0h1"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 15v5h16v-5"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4m-6.8 7 6.8 4"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 9l11-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="17" cy="16" rx="3" ry="3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m10 13 4-4m-5 6-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 2 2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 1)"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </defs></svg>
+
+  <header class="site-header">
+    <a class="brand" href="#invitation" aria-label="小日子，回到请柬"><span class="brand-mark"><svg class="icon"><use href="#i-star"/></svg><span></span></span><span>小日子<span class="brand-en">LITTLE DAYS</span></span></a>
+    <nav class="desktop-nav" aria-label="页面导航"><a class="active" href="#invitation">百日邀请</a><a href="#memories">成长时光</a><a href="#details">赴宴指南</a></nav>
+    <button class="button button-outline edit-trigger"><svg class="icon"><use href="#i-edit"/></svg><span>编辑请柬</span></button>
+  </header>
+
+  <main>
+    <div class="page-intro"><span><span class="status-dot"></span>一份小小的邀请，一场暖暖的相聚</span><span class="sample-badge" id="sample-badge">示例请柬</span></div>
+
+    <section class="invitation-card" id="invitation" aria-label="百日宴邀请函">
+      <div class="card-topline"><span>A LITTLE CELEBRATION, A LOT OF LOVE</span><button class="music-toggle" id="music-toggle" aria-label="播放轻柔音乐" aria-pressed="false" title="播放轻柔音乐"><svg class="icon"><use href="#i-music"/></svg><span class="music-line"></span></button></div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span> HELLO WORLD, I'M 100 DAYS OLD <span></span></div>
+          <h1>小小的你<br>大大的<span class="joy">欢喜<svg viewBox="0 0 150 15" aria-hidden="true"><path d="M3 9Q65-1 146 7M22 14q53-6 102-2"/></svg></span><span class="title-star">✧</span></h1>
+          <div class="baby-heading"><span class="tiny-star">✦</span><h2><span data-field="babyName">小满</span>宝宝 · 百日宴</h2><span class="tiny-star">✦</span></div>
+          <p class="hero-message">你是爸爸妈妈不期而遇的温暖<br>也是这个世界，赠予我们最好的礼物</p>
+          <div class="hero-signature"><span class="signature-line"></span>我们的宝贝，百日快乐<span class="signature-line"></span></div>
+        </div>
+        <div class="hero-visual">
+          <span class="hundred-bg" aria-hidden="true">100</span>
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+          <img class="bear-art" src="./assets/bear.svg" alt="戴着蓝色蝴蝶结的小熊，牵着气球坐在柔软的云朵上" width="580" height="570">
+          <div class="love-stamp"><svg class="icon"><use href="#i-heart"/></svg><span>100 DAYS</span><small>of being loved</small></div>
+          <span class="handwritten">a little boy,<br>a whole lot of joy.</span>
+        </div>
+      </div>
+      <div class="hero-footer"><div class="hero-date"><svg class="icon"><use href="#i-calendar"/></svg><span id="hero-date">2026.10.25</span><span class="footer-dot">·</span><span id="hero-weekday">星期日</span><span id="hero-time">12:00</span></div><a href="#details" class="hero-location"><svg class="icon"><use href="#i-pin"/></svg><span data-field="venue">云栖花园酒店</span><svg class="icon small-arrow"><use href="#i-arrow"/></svg></a></div>
+      <div class="gingham-strip" aria-hidden="true"></div>
+    </section>
+
+    <div class="under-card"><span>把平凡的日子，过成值得纪念的小日子。</span><a href="#memories">往下看看这份小美好 <span>↓</span></a></div>
+
+    <section class="welcome-note" aria-label="邀请寄语"><span class="note-star">✧</span><p>初来人间的第 <em>100</em> 天<br>想把这份欢喜，分享给亲爱的你</p><span class="note-line"></span><div>感谢一路的惦念与疼爱，诚邀您见证宝贝的第一个成长里程碑。<br>愿这一天，有可爱的你，也有满满的爱。</div></section>
+
+    <section class="memories-section" id="memories">
+      <div class="section-heading"><div><span class="section-kicker">LITTLE MOMENTS, BIG LOVE</span><h2>一百天的<span>可爱存档</span><svg class="icon"><use href="#i-heart"/></svg></h2></div><p>慢慢长大，是写给时间最甜的诗。</p></div>
+      <div class="memory-grid">
+        <article class="memory-card"><div class="photo-tape"></div><div class="memory-art memory-one"><img class="uploaded-photo" id="baby-photo" alt="宝宝的纪念照片" hidden><span class="moment-day">DAY 01</span></div><div class="memory-caption"><h3>初次见面，请多关照</h3><span>从此，我们的世界多了一个你。</span><svg class="icon"><use href="#i-heart"/></svg></div></article>
+        <article class="memory-card"><div class="photo-tape"></div><div class="memory-art memory-two"><span class="moment-day">DAY 30</span></div><div class="memory-caption"><h3>小小的手，握住整个世界</h3><span>每一个小变化，都让我们欣喜。</span><span class="caption-doodle">✧</span></div></article>
+        <article class="memory-card"><div class="photo-tape"></div><div class="memory-art memory-three"><span class="moment-day">DAY 100</span></div><div class="memory-caption"><h3>恭喜解锁，百日小可爱</h3><span>人生第一场派对，为你而来。</span><svg class="icon"><use href="#i-star"/></svg></div></article>
+      </div>
+    </section>
+
+    <section class="details-section" id="details">
+      <div class="details-intro"><span class="section-kicker">SAVE THE DATE</span><h2>赴一场<br>可爱的约定<span>。</span></h2><p>备好薄宴，装满期待<br>这一天，想和你一起度过。</p><div class="parents-signature"><svg class="icon"><use href="#i-heart"/></svg><span data-field="hosts">爸爸 & 妈妈</span><span>诚邀</span></div></div>
+      <div class="event-card">
+        <div class="event-row"><span class="event-icon"><svg class="icon"><use href="#i-calendar"/></svg></span><div class="event-content"><span class="event-label">相聚时间</span><h3 id="event-date">2026年10月25日 <span>星期日</span></h3><p id="event-time">中午 12:00 · 期待你的到来</p></div><button class="icon-button" id="calendar-button" aria-label="添加宴会到日历" title="添加到日历"><svg class="icon"><use href="#i-arrow"/></svg></button></div>
+        <div class="event-divider"></div>
+        <div class="event-row location-row"><span class="event-icon"><svg class="icon"><use href="#i-pin"/></svg></span><div class="event-content"><span class="event-label">欢聚地点</span><h3 data-field="venue">云栖花园酒店</h3><p data-field="address">杭州市西湖区之江路88号 · 二楼云悦厅</p><a id="map-link" class="text-link" target="_blank" rel="noopener noreferrer">打开地图导航 <svg class="icon"><use href="#i-arrow"/></svg></a></div></div>
+        <div class="event-note"><span>✧</span>你的到来，就是送给宝贝最温暖的礼物。</div>
+      </div>
+    </section>
+
+    <section class="closing-section"><span class="closing-star">✦</span><span class="section-kicker">CAN'T WAIT TO SEE YOU</span><h2>小满的百日，因你更圆满</h2><p>一场关于爱与成长的小小庆祝，期待与你相见。</p><div class="closing-actions"><button class="button button-primary" id="poster-button"><svg class="icon"><use href="#i-download"/></svg>保存邀请海报</button><button class="button button-light share-trigger"><svg class="icon"><use href="#i-share"/></svg>分享这份欢喜</button></div><span class="closing-hint">把邀请放进微信，把相聚放进日历</span></section>
+  </main>
+
+  <footer class="site-footer"><a class="footer-brand" href="#invitation">小日子 <span>Little days, lovely memories.</span></a><span>用爱，记录每一个值得纪念的日子 <svg class="icon"><use href="#i-heart"/></svg></span></footer>
+  <div class="mobile-actions"><a class="button button-light" href="#details"><svg class="icon"><use href="#i-pin"/></svg>赴宴指南</a><button class="button button-primary share-trigger"><svg class="icon"><use href="#i-share"/></svg>分享请柬</button></div>
+
+  <dialog id="edit-dialog" class="dialog edit-dialog" aria-labelledby="edit-title"><div class="dialog-heading"><div><span class="section-kicker">MAKE IT YOURS</span><h2 id="edit-title">写下你们的小欢喜</h2></div><button class="icon-button close-dialog" aria-label="关闭编辑"><svg class="icon"><use href="#i-close"/></svg></button></div><p class="dialog-description">把示例换成宝贝的信息，一份专属邀请就准备好啦。</p><form id="edit-form"><div class="form-grid"><label>宝宝昵称<input name="babyName" maxlength="16" required placeholder="例如：小满"></label><label>邀请人<input name="hosts" maxlength="40" required placeholder="例如：爸爸 & 妈妈"></label><label>宴会日期<input name="date" type="date" min="2000-01-01" max="2100-12-31" required></label><label>开席时间<input name="time" type="time" required></label><label class="full-width">宴会酒店<input name="venue" maxlength="60" required placeholder="酒店或餐厅名称"></label><label class="full-width">详细地址<input name="address" maxlength="140" required placeholder="城市、道路、门牌号与宴会厅"></label><label class="full-width photo-upload">宝宝照片 <span>选填，用于第一张成长纪念卡</span><input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp"><span class="photo-help">JPG、PNG 或 WebP，最大 8 MB</span></label></div><div class="form-bottom"><span>内容保存在当前浏览器</span><button class="button button-primary" type="submit"><svg class="icon"><use href="#i-check"/></svg>保存我的请柬</button></div></form></dialog>
+
+  <dialog id="share-dialog" class="dialog share-dialog" aria-labelledby="share-title">
+    <div class="dialog-heading"><div><span class="section-kicker">SHARE THE LITTLE JOY</span><h2 id="share-title">把欢喜，送到你身边</h2></div><button class="icon-button close-dialog" aria-label="关闭分享"><svg class="icon"><use href="#i-close"/></svg></button></div>
+    <p class="dialog-description" id="share-description">把 H5 请柬链接发到微信，亲友点开就能看完整请柬。</p>
+    <div id="h5-share-notice" class="h5-share-notice" role="note" hidden></div>
+    <div id="poster-preview" class="poster-preview" hidden><img id="poster-image" alt="宝宝百日宴邀请海报，可长按保存"></div>
+    <div class="share-options">
+      <button class="share-option share-option-primary" id="copy-link" aria-describedby="copy-link-hint"><span class="share-option-icon"><svg class="icon"><use href="#i-link"/></svg></span><span><strong id="copy-link-label">复制 H5 请柬链接</strong><small id="copy-link-hint">发到微信，点开就是完整请柬</small></span><svg class="icon"><use href="#i-arrow"/></svg></button>
+      <button class="share-option" id="native-share" hidden><span class="share-option-icon"><svg class="icon"><use href="#i-share"/></svg></span><span><strong>通过系统分享 H5</strong><small>选择可用的聊天或分享应用</small></span><svg class="icon"><use href="#i-arrow"/></svg></button>
+      <button class="share-option" id="generate-poster"><span class="share-option-icon"><svg class="icon"><use href="#i-download"/></svg></span><span><strong>保存邀请海报</strong><small>让这份可爱出现在朋友圈</small></span><svg class="icon"><use href="#i-arrow"/></svg></button>
+      <button class="share-option" id="copy-text"><span class="share-option-icon"><svg class="icon"><use href="#i-edit"/></svg></span><span><strong>复制邀请文案</strong><small>把时间和地点发到微信聊天</small></span><svg class="icon"><use href="#i-arrow"/></svg></button>
+    </div>
+    <div id="manual-link" class="manual-link" hidden><label for="share-link-value">长按或全选下方链接，手动复制</label><input id="share-link-value" type="text" readonly spellcheck="false" aria-label="H5 请柬链接"></div>
+    <a id="download-poster" class="button button-primary download-link" hidden download="百日宴邀请函.png"><svg class="icon"><use href="#i-download"/></svg>下载邀请海报</a>
+    <p id="poster-hint" class="poster-hint" hidden>微信内可长按上方海报，选择「保存图片」</p>
+    <p id="photo-share-note" class="photo-share-note" hidden>宝宝照片保留在当前设备，分享链接仅包含请柬文字。</p>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
