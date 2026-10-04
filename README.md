@@ -38,6 +38,45 @@ pnpm build
 
 如果使用 Cloudflare Pages，则构建命令填 `npm run build`，输出目录填 `dist`。通过控制台直接上传时，只上传 `dist/` 内容。
 
+## Sealos 镜像部署
+
+默认 `nginx` 镜像只包含欢迎页，不包含请柬。仓库中的 `Dockerfile` 会先构建静态文件，再打包为非 root 用户运行的 Nginx 镜像，服务端口为 **8080**。生产镜像不包含 Node.js、源代码仓库或测试文件。
+
+每次相关源码推送到 `main`，GitHub Actions 会构建镜像，使用 64 MB 内存限额验证网页及静态资源，再发布到 GitHub Container Registry：
+
+```text
+ghcr.io/maycode0-0/invitation-card:latest
+```
+
+同时发布与提交短 SHA 相同的固定标签。正式部署推荐使用构建成功的 SHA 标签，更新时切换至新标签。
+
+首次发布后，在 GitHub 账号的 Packages 中打开 `invitation-card` → Package settings → Change visibility，将镜像设为 **Public**，这样 Sealos 才能匿名拉取。公开源码仓库不会自动保证新建镜像也公开；不需要把 GitHub 密码或令牌填到请柬里。
+
+在 Sealos「应用管理 → 配置表单」中填写：
+
+| 设置 | 值 |
+| --- | --- |
+| 应用名称 | `invitation-card` |
+| 镜像地址 | 上述镜像地址，或构建成功后的 SHA 标签 |
+| 实例数 | `1` |
+| CPU | `0.1` 核起；可沿用 `0.2` 核 |
+| 内存 | `128 MiB` 起；可沿用 `256 MiB` |
+| 容器端口 | `8080` |
+| 公网访问 | 开启，外部访问使用 `HTTPS` |
+| 自定义域名 | 留空，使用平台分配的网址 |
+| 运行命令、环境变量、持久化存储 | 留空 |
+
+镜像中的 Nginx 提供容器内 HTTP 服务，外部 HTTPS 由 Sealos 公网入口处理。无需开启额外的 443 容器端口。保持公网访问开启，部署完成后从应用详情中的网络/外网访问处复制平台地址。
+
+如果 YAML 中只有 `Service` 和 `Deployment` 而没有公网入口，请回到配置表单确认公网访问已开启。如果出现 `ImagePullBackOff`，先确认 GitHub Actions 已构建成功、镜像标签存在且镜像已设为 Public，再检查该区域能否访问 `ghcr.io`。
+
+本地有 Docker 时，也可以运行：
+
+```sh
+docker build -t invitation-card .
+docker run --rm -p 8080:8080 invitation-card
+```
+
 ## 功能
 
 - 适配手机、平板和桌面；尊重系统减少动画设置。
@@ -65,5 +104,7 @@ H5 可以直接通过链接分享。先执行 `pnpm build`，将 `dist/` 内全�
 - `assets/`：本地原创 SVG 插画，不依赖远程图片。
 - `server.mjs`：仅提供公开网页资源的本地预览服务器。
 - `wrangler.jsonc`：Cloudflare Workers 构建及静态资源上传配置。
+- `Dockerfile`、`deploy/nginx.conf`：Sealos 等容器平台使用的静态网站镜像。
+- `.github/workflows/container.yml`：构建、检查并发布镜像。
 
 中文衬线字体使用项目内置的 Noto Serif SC 字体子集（约 141 KB，覆盖全部示例文案），开源许可证位于 `assets/fonts/OFL.txt`。自定义姓名中的其他汉字使用本机宋体回退。页面无需访问外部字体或图片服务。

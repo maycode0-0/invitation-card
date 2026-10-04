@@ -1,0 +1,81 @@
+name: Build and publish invitation image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'styles.css'
+      - 'app.js'
+      - 'assets/**'
+      - 'scripts/build.mjs'
+      - 'package.json'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'deploy/nginx.conf'
+      - '.github/workflows/container.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: invitation-container-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      IMAGE: ghcr.io/maycode0-0/invitation-card
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the static invitation image
+        run: |
+          docker build --pull \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            --tag "$IMAGE:latest" \
+            --tag "$IMAGE:${GITHUB_SHA::7}" .
+
+      - name: Verify the image with a 64 MB memory limit
+        run: |
+          docker run --detach --name invitation-check \
+            --publish 127.0.0.1:8080:8080 --memory 64m --cpus 0.2 \
+            --read-only --tmpfs /tmp:rw,noexec,nosuid,size=16m "$IMAGE:latest"
+          trap 'docker logs invitation-check; docker rm --force invitation-check' EXIT
+          curl --fail --silent --show-error --retry 10 --retry-connrefused \
+            --retry-delay 1 http://127.0.0.1:8080/ --output /tmp/invitation.html
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen
+          from urllib.error import HTTPError
+
+          assert '小日子' in Path('/tmp/invitation.html').read_text(encoding='utf-8')
+          for asset in ['styles.css', 'app.js', 'assets/bear.svg', 'assets/fonts/noto-serif-sc.ttf']:
+              with urlopen('http://127.0.0.1:8080/' + asset) as response:
+                  assert response.status == 200
+                  assert response.read(), asset
+          try:
+              urlopen('http://127.0.0.1:8080/package.json')
+              raise AssertionError('Source files must not be published')
+          except HTTPError as error:
+              assert error.code == 404
+          PY
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish the verified image
+        run: |
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:${GITHUB_SHA::7}"
+          echo "Image: \`$IMAGE:${GITHUB_SHA::7}\` (also tagged \`latest\`)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Container port: 8080. Set the package visibility to Public before anonymous pulls." >> "$GITHUB_STEP_SUMMARY"

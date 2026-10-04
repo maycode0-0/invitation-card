@@ -1,0 +1,10 @@
+.git
+.github
+.artifacts
+.wrangler
+node_modules
+dist
+output
+*.log
+.env
+.env.*
