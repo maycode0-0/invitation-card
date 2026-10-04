@@ -1,8 +1,8 @@
 (() => {
   'use strict';
-  const DEFAULTS = { babyName: '小满', hosts: '爸爸 & 妈妈', date: '2026-10-25', time: '12:00', venue: '云栖花园酒店', address: '杭州市西湖区之江路88号 · 二楼云悦厅' };
+  const DEFAULTS = { babyName: '小橙子', hosts: '爸爸 & 妈妈', date: '2026-10-11', time: '12:00', venue: '在水一方', address: '四川省成都市郫都区青石路青杠树村6号点21栋' };
   const LIMITS = { babyName: 16, hosts: 40, date: 10, time: 5, venue: 60, address: 140 };
-  const STORAGE_KEY = 'little-days-invitation-v1';
+  const STORAGE_KEY = 'little-days-invitation-xiaochengzi-20261011-v1';
   const PHOTO_KEY = 'little-days-photo-v1';
   const $ = (selector) => document.querySelector(selector);
   const editDialog = $('#edit-dialog');
@@ -54,7 +54,7 @@
       const savedPhoto = localStorage.getItem(PHOTO_KEY);
       if (savedPhoto?.startsWith('data:image/jpeg;base64,')) photo = savedPhoto;
     }
-  } catch { toast('已为你打开示例请柬，可以重新编辑信息。'); }
+  } catch { toast('已为你打开请柬，可以重新确认邀请信息。'); }
 
   const eventDate = () => new Date(`${state.date}T${state.time}:00+08:00`);
   const weekday = () => new Intl.DateTimeFormat('zh-CN', { weekday: 'long', timeZone: 'Asia/Shanghai' }).format(eventDate());
@@ -87,10 +87,11 @@
     $('#event-time').textContent = `${timeLabel()} · 期待你的到来`;
     $('#map-link').href = `https://uri.amap.com/search?keyword=${encodeURIComponent(state.venue + ' ' + state.address)}&callnative=0`;
     $('.closing-section h2').textContent = `${state.babyName}的百日，因你更圆满`;
-    $('#sample-badge').textContent = sharedView ? '邀你相聚' : customized ? '专属请柬' : '示例请柬';
+    $('#sample-badge').textContent = sharedView ? '邀你相聚' : customized ? '专属请柬' : '诚邀莅临';
     document.title = `${state.babyName}的百日宴 · 小日子`;
     $('meta[name="description"]').content = `${state.babyName}宝宝的百日宴 · ${dateLabel()} ${state.time} · ${state.venue}。小小的你，大大的欢喜。`;
     $('meta[property="og:title"]').content = `${state.babyName}宝宝的百日宴邀请函`;
+    $('meta[property="og:description"]').content = `${dateLabel()} ${state.time}，相聚${state.venue}。小小的你，大大的欢喜。`;
     if (photo) { $('#baby-photo').src = photo; $('#baby-photo').hidden = false; }
     else { $('#baby-photo').hidden = true; $('#baby-photo').removeAttribute('src'); }
     if (posterUrl) { URL.revokeObjectURL(posterUrl); posterUrl = ''; }
