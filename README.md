@@ -19,6 +19,25 @@ pnpm build
 
 生成的 `dist/` 可部署到任意静态网站托管服务。建议部署到 HTTPS 地址，再在微信中分享。
 
+## Cloudflare 部署
+
+仓库已包含 `wrangler.jsonc`，用于 Cloudflare Workers 的静态网站部署。Wrangler 会先执行 `npm run build`，然后只上传 `dist/` 中的网页、插画和字体。
+
+如果使用 Cloudflare Workers 的 Git 仓库集成，设置如下：
+
+| 设置 | 值 |
+| --- | --- |
+| 根目录 | 仓库根目录 `/` |
+| 构建命令 | `npm run build` |
+| 部署命令 | `npx wrangler deploy` |
+| 静态资源目录 | 由 `wrangler.jsonc` 指定为 `./dist` |
+
+控制台构建和 Wrangler 自定义构建可能各运行一次，重复构建不会影响结果。项目名称默认为 `invitation-card`，如控制台使用其他名称，请同步修改 `wrangler.jsonc` 中的 `name`。
+
+不要在部署命令中使用 `--assets .` 或 `--assets ./`：命令行参数会覆盖配置文件，导致整个仓库（包括安装产生的 `node_modules`）被作为网站资源上传。若日志出现 `Asset too large`，并指向 `node_modules/workerd/bin/workerd`，请将部署命令改成上表中的命令，使用最新提交重新部署。
+
+如果使用 Cloudflare Pages，则构建命令填 `npm run build`，输出目录填 `dist`。通过控制台直接上传时，只上传 `dist/` 内容。
+
 ## 功能
 
 - 适配手机、平板和桌面；尊重系统减少动画设置。
@@ -45,5 +64,6 @@ H5 可以直接通过链接分享。先执行 `pnpm build`，将 `dist/` 内全�
 - `app.js`：编辑、存储、海报、分享、地图、日历与音乐。
 - `assets/`：本地原创 SVG 插画，不依赖远程图片。
 - `server.mjs`：仅提供公开网页资源的本地预览服务器。
+- `wrangler.jsonc`：Cloudflare Workers 构建及静态资源上传配置。
 
 中文衬线字体使用项目内置的 Noto Serif SC 字体子集（约 141 KB，覆盖全部示例文案），开源许可证位于 `assets/fonts/OFL.txt`。自定义姓名中的其他汉字使用本机宋体回退。页面无需访问外部字体或图片服务。
