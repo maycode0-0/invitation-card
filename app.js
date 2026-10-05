@@ -44,9 +44,6 @@
     day.textContent = weekday();
     $('#event-date').replaceChildren(document.createTextNode(dateLabel() + ' '), day);
     $('#event-time').textContent = `${timeLabel()} · 期待你的到来`;
-    const mapSearch = new URLSearchParams({ keyword: `${state.venue} 青杠树村`, city: '成都市', view: 'map', src: 'xiaochengzi-invitation', callnative: '0' });
-    $('#map-link').href = `https://uri.amap.com/search?${mapSearch}`;
-    $('#map-link').firstChild.textContent = '在成都搜索地点 ';
     $('.closing-section h2').textContent = `${state.babyName}的百日，因你更圆满`;
     document.title = `${state.babyName}的百日宴 · 小日子`;
     $('meta[name="description"]').content = `${state.babyName}宝宝的百日宴 · ${dateLabel()} ${state.time} · ${state.venue}。小小的你，大大的欢喜。`;
@@ -91,7 +88,7 @@
 
   function shareUrl() {
     const url = new URL(location.href);
-    url.searchParams.set('v', '20261005-day30');
+    url.searchParams.set('v', '20261005-venue');
     url.hash = '';
     return url.href;
   }
