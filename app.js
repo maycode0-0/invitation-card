@@ -245,42 +245,91 @@
   let musicTimer;
   let musicOn = false;
   let sequence = 0;
-  const melody = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46, 523.25, 659.25, 783.99, 1046.5, 880, 783.99, 659.25, 587.33];
-  function note(frequency, time, duration, volume) {
+  let nextNoteTime = 0;
+  const activeNotes = new Set();
+  const beat = 60 / 112;
+  const melody = [
+    76, 79, 81, 79, 76, 0, 74, 0,
+    72, 76, 79, 0, 76, 74, 72, 0,
+    77, 81, 84, 83, 81, 0, 79, 0,
+    79, 76, 74, 0, 72, 0, 67, 0,
+    76, 79, 81, 79, 84, 0, 83, 81,
+    79, 76, 77, 81, 79, 0, 76, 0,
+    77, 81, 79, 76, 74, 0, 79, 0,
+    76, 74, 72, 0, 0, 0, 67, 71
+  ];
+  const chords = [
+    [48, 55, 60, 64, 67], [45, 52, 57, 60, 64],
+    [53, 60, 60, 65, 69], [55, 62, 59, 62, 67],
+    [48, 55, 60, 64, 67], [45, 52, 57, 60, 64],
+    [53, 60, 60, 65, 69], [48, 55, 60, 64, 67]
+  ];
+  function note(midi, time, duration, volume, type = 'sine') {
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
-    oscillator.type = 'sine'; oscillator.frequency.value = frequency;
+    oscillator.type = type; oscillator.frequency.value = 440 * 2 ** ((midi - 69) / 12);
     gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(volume, time + .05);
+    gain.gain.linearRampToValueAtTime(volume, time + .008);
     gain.gain.exponentialRampToValueAtTime(.0001, time + duration);
     oscillator.connect(gain); gain.connect(masterGain);
-    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-    oscillator.start(time); oscillator.stop(time + duration + .05);
+    activeNotes.add(oscillator);
+    oscillator.onended = () => { activeNotes.delete(oscillator); oscillator.disconnect(); gain.disconnect(); };
+    oscillator.start(time); oscillator.stop(time + duration + .02);
   }
-  function musicPhrase() {
-    const start = audioContext.currentTime + .05;
-    for (let i = 0; i < 4; i++) note(melody[(sequence + i) % melody.length], start + i * .7, 1.5, .1);
-    note([130.81, 174.61, 130.81, 146.83][Math.floor(sequence / 4) % 4], start, 3.1, .055);
-    sequence = (sequence + 4) % melody.length;
+  function musicStep(step, time) {
+    const pitch = melody[step];
+    const position = step % 8;
+    const chord = chords[Math.floor(step / 8)];
+    if (pitch) {
+      const duration = melody[(step + 1) % melody.length] ? .38 : .64;
+      note(pitch, time, duration, .10);
+      note(pitch + 12, time, .18, .018);
+    }
+    if (position === 0 || position === 4) note(chord[position === 0 ? 0 : 1], time, .28, .055, 'triangle');
+    if (position === 2 || position === 6) chord.slice(2).forEach((pitch, index) => note(pitch, time + index * .014, .19, .016, 'triangle'));
+  }
+  function scheduleMusic() {
+    if (!musicOn) return;
+    // Schedule against the audio clock so the rhythm stays even when frames vary.
+    if (nextNoteTime < audioContext.currentTime) nextNoteTime = audioContext.currentTime + .03;
+    while (nextNoteTime < audioContext.currentTime + .12) {
+      musicStep(sequence, nextNoteTime);
+      sequence = (sequence + 1) % melody.length;
+      nextNoteTime += beat / 2;
+    }
   }
   function setMusic(on) {
     musicOn = on;
     $('#music-toggle').setAttribute('aria-pressed', String(on));
-    $('#music-toggle').setAttribute('aria-label', on ? '暂停轻柔音乐' : '播放轻柔音乐');
-    $('#music-toggle').title = on ? '暂停轻柔音乐' : '播放轻柔音乐';
+    $('#music-toggle').setAttribute('aria-label', on ? '暂停轻快音乐' : '播放轻快音乐');
+    $('#music-toggle').title = on ? '暂停轻快音乐' : '播放轻快音乐';
     clearInterval(musicTimer);
-    if (on) { masterGain.gain.setValueAtTime(1, audioContext.currentTime); musicPhrase(); musicTimer = setInterval(musicPhrase, 2800); }
-    else if (audioContext) { masterGain.gain.setTargetAtTime(0, audioContext.currentTime, .06); }
+    if (!audioContext) return;
+    const now = audioContext.currentTime;
+    masterGain.gain.cancelScheduledValues(now);
+    if (on) {
+      activeNotes.forEach(oscillator => oscillator.stop(now));
+      masterGain.gain.setValueAtTime(0, now);
+      masterGain.gain.linearRampToValueAtTime(1, now + .06);
+      sequence = 0; nextNoteTime = now + .06;
+      scheduleMusic(); musicTimer = setInterval(scheduleMusic, 25);
+    } else {
+      masterGain.gain.setTargetAtTime(0, now, .012);
+      activeNotes.forEach(oscillator => oscillator.stop(now + .06));
+    }
   }
   $('#music-toggle').addEventListener('click', async () => {
+    const button = $('#music-toggle');
     try {
       if (musicOn) { setMusic(false); return; }
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) { toast('当前浏览器暂不支持音乐播放。'); return; }
       if (!audioContext) { audioContext = new Audio(); masterGain = audioContext.createGain(); masterGain.connect(audioContext.destination); }
+      button.disabled = true;
       await audioContext.resume();
-      setMusic(true);
+      if (!document.hidden) setMusic(true);
     } catch { toast('音乐未能播放，轻触按钮再试一次。'); }
+    finally { button.disabled = false; }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden && musicOn) setMusic(false); });
   if ('IntersectionObserver' in window) {
