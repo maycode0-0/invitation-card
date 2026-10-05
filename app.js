@@ -244,6 +244,8 @@
   let masterGain;
   let musicTimer;
   let musicOn = false;
+  let autoMusicAllowed = true;
+  let musicStartRequest = 0;
   let sequence = 0;
   let nextNoteTime = 0;
   const activeNotes = new Set();
@@ -318,20 +320,53 @@
       activeNotes.forEach(oscillator => oscillator.stop(now + .06));
     }
   }
-  $('#music-toggle').addEventListener('click', async () => {
-    const button = $('#music-toggle');
+  async function startMusic(automatic = false) {
+    if (document.hidden || musicOn || automatic && !autoMusicAllowed) return;
+    const request = ++musicStartRequest;
     try {
-      if (musicOn) { setMusic(false); return; }
       const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!Audio) { toast('当前浏览器暂不支持音乐播放。'); return; }
+      if (!Audio) {
+        if (!automatic) toast('当前浏览器暂不支持音乐播放。');
+        return;
+      }
       if (!audioContext) { audioContext = new Audio(); masterGain = audioContext.createGain(); masterGain.connect(audioContext.destination); }
-      button.disabled = true;
+      // Browsers may leave this promise pending until the first user gesture.
       await audioContext.resume();
-      if (!document.hidden) setMusic(true);
-    } catch { toast('音乐未能播放，轻触按钮再试一次。'); }
-    finally { button.disabled = false; }
+      if (request !== musicStartRequest || document.hidden || automatic && !autoMusicAllowed) return;
+      if (audioContext.state === 'running') {
+        setMusic(true);
+        autoMusicAllowed = false;
+        removeMusicGestureListeners();
+      }
+    } catch { if (!automatic && request === musicStartRequest) toast('音乐未能播放，轻触按钮再试一次。'); }
+  }
+  function startMusicOnGesture(event) {
+    if (event.target instanceof Element && event.target.closest('#music-toggle')) return;
+    if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return;
+    startMusic(true);
+  }
+  function removeMusicGestureListeners() {
+    ['pointerup', 'touchend', 'keydown'].forEach(type => document.removeEventListener(type, startMusicOnGesture));
+  }
+  function startWeChatMusic() {
+    if (!autoMusicAllowed || !window.WeixinJSBridge?.invoke) return;
+    try {
+      window.WeixinJSBridge.invoke('getNetworkType', {}, () => startMusic(true));
+    } catch { /* A normal page gesture can still start playback. */ }
+  }
+  $('#music-toggle').addEventListener('click', () => {
+    autoMusicAllowed = false;
+    musicStartRequest++;
+    removeMusicGestureListeners();
+    if (musicOn) setMusic(false);
+    else startMusic();
   });
-  document.addEventListener('visibilitychange', () => { if (document.hidden && musicOn) setMusic(false); });
+  ['pointerup', 'touchend', 'keydown'].forEach(type => document.addEventListener(type, startMusicOnGesture, { passive: true }));
+  document.addEventListener('WeixinJSBridgeReady', startWeChatMusic);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { musicStartRequest++; if (musicOn) setMusic(false); }
+    else if (autoMusicAllowed) startMusic(true);
+  });
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) if (entry.isIntersecting) document.querySelectorAll('.desktop-nav a').forEach(link => link.classList.toggle('active', link.hash === '#' + entry.target.id));
@@ -339,4 +374,6 @@
     ['invitation', 'memories', 'details'].forEach(id => observer.observe(document.getElementById(id)));
   }
   render();
+  startMusic(true);
+  startWeChatMusic();
 })();
