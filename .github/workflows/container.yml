@@ -67,7 +67,7 @@ jobs:
           from urllib.error import HTTPError
 
           assert '小日子' in Path('/tmp/invitation.html').read_text(encoding='utf-8')
-          for asset in ['styles.css', 'app.js', 'assets/bear.svg', 'assets/fonts/noto-serif-sc.ttf']:
+          for asset in ['styles.css', 'app.js', 'assets/bear.svg', 'assets/bear.png', 'assets/share-cover.png', 'assets/photos/01.webp', 'assets/photos/02.webp', 'assets/photos/03.webp', 'assets/fonts/noto-serif-sc.ttf']:
               with urlopen('http://127.0.0.1:8080/' + asset) as response:
                   assert response.status == 200
                   assert response.read(), asset

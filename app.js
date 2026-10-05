@@ -3,7 +3,7 @@
   const DEFAULTS = { babyName: '小橙子', hosts: '爸爸 & 妈妈', date: '2026-10-11', time: '12:00', venue: '在水一方', address: '四川省成都市郫都区青石路青杠树村6号点21栋' };
   const LIMITS = { babyName: 16, hosts: 40, date: 10, time: 5, venue: 60, address: 140 };
   const STORAGE_KEY = 'little-days-invitation-xiaochengzi-20261011-v1';
-  const PHOTO_KEY = 'little-days-photo-v1';
+  const PHOTO_KEY = 'little-days-photo-xiaochengzi-20261005-v1';
   const $ = (selector) => document.querySelector(selector);
   const editDialog = $('#edit-dialog');
   const shareDialog = $('#share-dialog');
@@ -70,7 +70,7 @@
     $('#h5-share-notice').hidden = !local && !isWeChat();
     $('#h5-share-notice').textContent = local
       ? '当前请柬还在本机预览。H5 链接可以复制，但亲友暂时无法打开；发布到公网后，即可通过微信分享。'
-      : '在微信里，点击右上角「···」→「发送给朋友」即可分享 H5；也可以复制下方链接。';
+      : '点击微信右上角「···」→「发送给朋友」转发请柬。封面是否显示由微信决定；粘贴链接会发送网址。';
     $('#native-share').hidden = local || isWeChat() || typeof navigator.share !== 'function';
     $('#share-description').textContent = '把 H5 请柬链接发到微信，亲友点开就能看完整请柬。';
     $('#manual-link').hidden = true;
@@ -193,6 +193,7 @@
   function shareUrl() {
     const encoded = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(state)))).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
     const url = new URL(location.href);
+    url.searchParams.set('v', '20261005-2');
     url.hash = 'invite=' + encoded;
     return url.href;
   }
