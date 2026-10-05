@@ -1,37 +1,12 @@
 (() => {
   'use strict';
-  const DEFAULTS = { babyName: '小橙子', hosts: '爸爸 & 妈妈', date: '2026-10-11', time: '12:00', venue: '在水一方', address: '四川省成都市郫都区青石路青杠树村6号点21栋' };
-  const LIMITS = { babyName: 16, hosts: 40, date: 10, time: 5, venue: 60, address: 140 };
-  const STORAGE_KEY = 'little-days-invitation-xiaochengzi-20261011-v1';
-  const PHOTO_KEY = 'little-days-photo-xiaochengzi-20261005-v1';
+  const DEFAULTS = { babyName: '小橙子', hosts: '谢晓青 邓静', date: '2026-10-11', time: '12:00', venue: '在水一方', address: '四川省成都市郫都区青石路青杠树村6号点21栋' };
   const $ = (selector) => document.querySelector(selector);
-  const editDialog = $('#edit-dialog');
   const shareDialog = $('#share-dialog');
-  const form = $('#edit-form');
-  let state = { ...DEFAULTS };
-  let customized = false;
-  let sharedView = false;
-  let photo = '';
+  const state = Object.freeze({ ...DEFAULTS });
   let toastTimer;
   let posterUrl = '';
   let generating = false;
-
-  function validDate(value) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '2000-01-01' || value > '2100-12-31') return false;
-    const date = new Date(value + 'T12:00:00+08:00');
-    return !isNaN(date.valueOf()) && new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date) === value;
-  }
-
-  function normalize(input) {
-    const result = { ...DEFAULTS };
-    if (!input || typeof input !== 'object') return result;
-    for (const key of Object.keys(DEFAULTS)) {
-      if (typeof input[key] === 'string' && input[key].trim()) result[key] = input[key].trim().slice(0, LIMITS[key]);
-    }
-    if (!validDate(result.date)) result.date = DEFAULTS.date;
-    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(result.time)) result.time = DEFAULTS.time;
-    return result;
-  }
 
   function toast(message) {
     clearTimeout(toastTimer);
@@ -39,22 +14,6 @@
     $('#toast').classList.add('show');
     toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 3600);
   }
-
-  try {
-    if (location.hash.startsWith('#invite=')) {
-      const encoded = location.hash.slice(8);
-      if (encoded.length > 6000) throw new Error('Invitation too large');
-      const bytes = Uint8Array.from(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-      state = normalize(JSON.parse(new TextDecoder().decode(bytes)));
-      sharedView = true;
-      customized = true;
-    } else {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) { state = normalize(JSON.parse(stored)); customized = true; }
-      const savedPhoto = localStorage.getItem(PHOTO_KEY);
-      if (savedPhoto?.startsWith('data:image/jpeg;base64,')) photo = savedPhoto;
-    }
-  } catch { toast('已为你打开请柬，可以重新确认邀请信息。'); }
 
   const eventDate = () => new Date(`${state.date}T${state.time}:00+08:00`);
   const weekday = () => new Intl.DateTimeFormat('zh-CN', { weekday: 'long', timeZone: 'Asia/Shanghai' }).format(eventDate());
@@ -87,19 +46,15 @@
     $('#event-time').textContent = `${timeLabel()} · 期待你的到来`;
     $('#map-link').href = `https://uri.amap.com/search?keyword=${encodeURIComponent(state.venue + ' ' + state.address)}&callnative=0`;
     $('.closing-section h2').textContent = `${state.babyName}的百日，因你更圆满`;
-    $('#sample-badge').textContent = sharedView ? '邀你相聚' : customized ? '专属请柬' : '诚邀莅临';
     document.title = `${state.babyName}的百日宴 · 小日子`;
     $('meta[name="description"]').content = `${state.babyName}宝宝的百日宴 · ${dateLabel()} ${state.time} · ${state.venue}。小小的你，大大的欢喜。`;
     $('meta[property="og:title"]').content = `${state.babyName}宝宝的百日宴邀请函`;
     $('meta[property="og:description"]').content = `${dateLabel()} ${state.time}，相聚${state.venue}。小小的你，大大的欢喜。`;
-    if (photo) { $('#baby-photo').src = photo; $('#baby-photo').hidden = false; }
-    else { $('#baby-photo').hidden = true; $('#baby-photo').removeAttribute('src'); }
     if (posterUrl) { URL.revokeObjectURL(posterUrl); posterUrl = ''; }
     $('#poster-preview').hidden = true;
     $('#download-poster').hidden = true;
     $('#poster-hint').hidden = true;
     $('#generate-poster strong').textContent = '保存邀请海报';
-    $('#photo-share-note').hidden = !photo;
     updateShareOptions();
   }
 
@@ -111,16 +66,6 @@
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
-  }));
-  document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', event => {
-    if (!location.hash.startsWith('#invite=')) return;
-    const target = document.getElementById(link.hash.slice(1));
-    if (target) { event.preventDefault(); target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); }
-  }));
-  document.querySelectorAll('.edit-trigger').forEach(button => button.addEventListener('click', () => {
-    for (const key of Object.keys(DEFAULTS)) form.elements.namedItem(key).value = state[key];
-    $('#photo-input').value = '';
-    openDialog(editDialog);
   }));
   function openShareDialog() {
     updateShareOptions();
@@ -138,69 +83,20 @@
     });
   }
 
-  async function readPhoto(file) {
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('请选择 JPG、PNG 或 WebP 照片。');
-    if (file.size > 8 * 1024 * 1024) throw new Error('照片超过 8 MB，请选择小一些的图片。');
-    const url = URL.createObjectURL(file);
-    try {
-      const image = await loadImage(url);
-      const scale = Math.min(1, 1200 / Math.max(image.naturalWidth, image.naturalHeight));
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(image.naturalWidth * scale);
-      canvas.height = Math.round(image.naturalHeight * scale);
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#f8f7f2'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL('image/jpeg', .85);
-    } finally { URL.revokeObjectURL(url); }
-  }
-
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
-    if (!form.reportValidity()) return;
-    const submitted = Object.fromEntries(new FormData(form));
-    if (Object.keys(DEFAULTS).some(key => !submitted[key]?.trim())) { toast('请把宴会信息填写完整。'); return; }
-    if (!validDate(submitted.date)) { toast('请选择有效的宴会日期。'); return; }
-    const button = form.querySelector('[type="submit"]');
-    button.disabled = true;
-    try {
-      const file = $('#photo-input').files[0];
-      if (file) photo = await readPhoto(file);
-      state = normalize(submitted);
-      customized = true;
-      sharedView = false;
-      let persisted = true;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        if (photo) localStorage.setItem(PHOTO_KEY, photo);
-        else localStorage.removeItem(PHOTO_KEY);
-      } catch { persisted = false; }
-      if (location.hash.startsWith('#invite=')) {
-        if (isLocal()) history.replaceState(null, '', location.pathname + location.search);
-        else prepareH5Share();
-      }
-      render();
-      editDialog.close();
-      toast(persisted ? '专属请柬已保存，这份欢喜准备好啦。' : '请柬已更新。浏览器无法保存，请及时下载海报。');
-    } catch (error) { toast(error.message || '照片未能读取，请重新选择。'); }
-    finally { button.disabled = false; }
-  });
-
   function invitationText() {
     return `💌 ${state.babyName}宝宝的百日宴\n\n小小的你，大大的欢喜。\n诚邀您一起见证宝贝的第一个成长里程碑。\n\n时间：${dateLabel()} ${weekday()} ${state.time}\n地点：${state.venue}\n地址：${state.address}\n\n${state.hosts} 诚邀\n你的到来，就是最温暖的礼物。`;
   }
 
   function shareUrl() {
-    const encoded = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(state)))).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
     const url = new URL(location.href);
-    url.searchParams.set('v', '20261005-2');
-    url.hash = 'invite=' + encoded;
+    url.searchParams.set('v', '20261005-3');
+    url.hash = '';
     return url.href;
   }
 
   function prepareH5Share() {
     const url = shareUrl();
-    // WeChat's menu shares the current address, including the latest invitation.
+    // Share the current published invitation; old edited-link data is no longer used.
     if (!isLocal()) {
       try { history.replaceState(null, '', url); } catch { /* Copying still works if URL replacement is unavailable. */ }
     }

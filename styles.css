@@ -1,4 +1,4 @@
-@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:400 700;font-display:swap;src:url('./assets/fonts/noto-serif-sc.ttf?v=20261005') format('truetype')}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:400 700;font-display:swap;src:url('./assets/fonts/noto-serif-sc.ttf?v=20261005-3') format('truetype')}
 
 .memory-photo{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}.memory-one .memory-photo{object-position:50% 70%}.memory-two .memory-photo{object-position:50% 50%}.memory-three .memory-photo{object-position:50% 74%}.memory-art:has(.memory-photo){background-image:none}.memory-art .moment-day{padding:5px 7px;border-radius:3px;background:#fffdf3e8;color:#617982}
 
