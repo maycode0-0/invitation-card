@@ -89,7 +89,7 @@
 
   function shareUrl() {
     const url = new URL(location.href);
-    url.searchParams.set('v', '20261005-3');
+    url.searchParams.set('v', '20261005-cover');
     url.hash = '';
     return url.href;
   }
@@ -191,7 +191,7 @@
     button.querySelector('strong').textContent = '正在准备这份可爱…';
     try {
       await Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 2500))]);
-      const bear = await loadImage('./assets/bear.svg');
+      const cover = await loadImage('./assets/photos/cover.webp');
       const canvas = document.createElement('canvas');
       canvas.width = 1080; canvas.height = 1560;
       const ctx = canvas.getContext('2d');
@@ -207,8 +207,11 @@
       ctx.strokeStyle = '#c6b389'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(597, 426); ctx.quadraticCurveTo(698, 411, 807, 422); ctx.stroke();
       canvasText(ctx, `✦  ${state.babyName}宝宝 · 百日宴  ✦`, 540, 497, 37, '#657e8b');
       canvasText(ctx, '你是这个世界，赠予我们最好的礼物', 540, 548, 24, '#8a9ea6', { sans: true });
-      canvasText(ctx, '100', 540, 765, 190, '#cedee25c', { italic: true });
-      ctx.drawImage(bear, 245, 532, 590, 580);
+      ctx.save();
+      ctx.shadowColor = '#60777922'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8;
+      ctx.fillStyle = '#fffdf7'; ctx.fillRect(340, 566, 400, 518);
+      ctx.restore();
+      ctx.drawImage(cover, 356, 582, 368, 368 * cover.naturalHeight / cover.naturalWidth);
       ctx.strokeStyle = '#cbdce0'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(150, 1096); ctx.lineTo(930, 1096); ctx.stroke();
       canvasText(ctx, `${state.date.replaceAll('-', '.')}    ${weekday()}    ${state.time}`, 540, 1152, 31, '#597a8c');
       canvasText(ctx, state.venue, 540, 1212, 34, '#597a8c');
